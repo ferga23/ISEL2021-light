@@ -1,0 +1,51 @@
+/*
+ * Modelo para verificacion formal, especificacion LTL
+ * Ejemplo de control de una luz con pulsadores inalámbricos
+ * 
+ * Fernando Garcia Gutierrez
+ *
+ * ISEL2021
+ *
+*/
+
+/* Entradas */
+
+int deadline;
+int boton;
+
+/* Salida */
+
+int luz;
+
+/* Procesos */
+
+active proctype fsm()
+{
+
+ int estado = 0;
+ 
+ do
+ :: (estado == 0) -> atomic {
+	if
+	:: (boton) -> luz = 1; estado = 1; boton = 0; printf("Transicion de estado 0 a estado 1");
+	fi
+ }
+ :: (estado == 1) -> atomic {
+	if
+	:: (boton) -> boton = 0; printf("Transicion al mismo estado (1)");
+	:: (deadline && !boton) -> estado = 0; luz = 0; printf("Transicion de estado 1 a estado 0");
+	fi
+ }
+ od
+
+}
+
+active proctype enviroment() 
+{
+	do
+		if
+		:: boton = 1;
+		:: (!boton) -> skip;
+		fi
+	od
+}
